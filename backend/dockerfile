@@ -1,0 +1,35 @@
+# ---- Etapa de Build ----
+# Usamos una imagen de Node completa para tener todas las herramientas de build
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copiamos package.json y package-lock.json
+COPY package*.json ./
+
+# Instalamos TODAS las dependencias, incluidas las de desarrollo para poder hacer el build
+RUN npm install
+
+# Copiamos el resto del código fuente
+COPY . .
+
+# Ejecutamos el script de build
+RUN npm run build
+
+# ---- Etapa de Producción ----
+# Empezamos desde una imagen limpia y ligera de Node
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copiamos package.json y package-lock.json otra vez
+COPY package*.json ./
+
+# Instalamos SOLAMENTE las dependencias de producción
+RUN npm install --omit=dev
+
+# Copiamos los archivos compilados desde la etapa de 'builder'
+COPY --from=builder /app/dist ./dist
+
+# El comando para iniciar la aplicación en producción
+CMD ["npm", "start"]

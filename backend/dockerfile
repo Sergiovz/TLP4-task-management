@@ -1,6 +1,6 @@
 # ---- Etapa de Build ----
 # Usamos una imagen de Node completa para tener todas las herramientas de build
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ RUN npm run build
 
 # ---- Etapa de Producción ----
 # Empezamos desde una imagen limpia y ligera de Node
-FROM node:18-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
